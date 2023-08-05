@@ -68,25 +68,31 @@ app.post('/api/register', async (req, res) => {
 
 // User Login Route
 app.post('/api/login', passport.authenticate('local'), (req, res) => {
-  // If the authentication is successful, this callback will be called.
-  // You can handle the response here, such as sending a success message or redirecting to a dashboard.
-  res.json({ message: 'Login successful' });
+  res.redirect('/index.html');
 });
 
 // Logout Route
-app.get('/api/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   // Passport provides the `logout` function to terminate a login session.
   // It will clear the login session and remove the `req.user` property.
-  req.logout();
-  res.json({ message: 'Logged out successfully' });
+  req.logout((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      res.status(500).json({ message: 'Logout failed' });
+    } else {
+      // Redirect the user to the desired page after successful logout
+      console.log('Logout success');
+      res.redirect('/index.html'); // Replace '/index' with the URL you want to redirect to
+    }
+  });
 });
 
 // Protected Route
-app.get('/api/dashboard', (req, res) => {
+app.get('/api/stats', (req, res) => {
   // This route is protected and requires the user to be authenticated.
   // Passport's session handling will ensure that only authenticated users can access this route.
   if (req.isAuthenticated()) {
-    res.json({ message: 'Welcome to the dashboard!' });
+    res.json({ message: 'Welcome to the Stats page!' });
   } else {
     res.status(401).json({ message: 'Unauthorized' });
   }

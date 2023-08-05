@@ -1,8 +1,6 @@
-const { DataTypes } = require('sequelize');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
-const sequelize = require('./db');
 const User = require('./userModel');
 
 // Passport LocalStrategy
@@ -25,7 +23,7 @@ const strategy = new LocalStrategy(async (username, password, done) => {
 
 // Passport serialization and deserialization of user
 passport.serializeUser((user, done) => {
-  done(null, user.userId); // Use the appropriate property for serialization
+  done(null, user.user_id); // Use the appropriate property for serialization
 });
 
 passport.deserializeUser(async (id, done) => {
@@ -38,6 +36,6 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Initialize Passport with the LocalStrategy
-passport.use(strategy);
+passport.use('local', strategy);
 
 module.exports = passport;
