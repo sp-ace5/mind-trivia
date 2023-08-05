@@ -108,31 +108,33 @@ function restartGame() {
   fetchQuestions();
 }
 
-const logoutBtn = document.getElementById('logoutBtn');
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logoutBtn');
 
-// Add an event listener to the "Log Out" link
-logoutBtn.addEventListener('click', async () => {
-  try {
-    // Send a GET request to the logout route
-    const response = await fetch('/api/logout', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  // Add an event listener to the "Log Out" link
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      // Send a GET request to the logout route
+      const response = await fetch('/api/logout', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    if (!response.ok) {
-      // Handle logout error, if needed
-      console.error('Logout failed:', response.statusText);
-      return;
+      if (!response.ok) {
+        // Handle logout error, if needed
+        console.error('Logout failed:', response.statusText);
+        return;
+      }
+
+      // Logout successful, redirect to the desired page (e.g., /index.html)
+      window.location.href = '/index.html'; // Replace '/index.html' with the desired URL
+    } catch (error) {
+      // Handle any network errors or other exceptions
+      console.error('Logout error:', error.message);
     }
-
-    // Logout successful, redirect to the desired page (e.g., /index)
-    window.location.href = '/index'; // Replace '/index' with the desired URL
-  } catch (error) {
-    // Handle any network errors or other exceptions
-    console.error('Logout error:', error.message);
-  }
+  });
 });
 
 // Add event handlers to the next/restart button to call a function when the button is clicked.
