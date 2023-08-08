@@ -51,13 +51,20 @@
               <li>
                 <hr class="dropdown-divider">
               </li>
-              <li><a class="dropdown-item" href="/logout">Log Out</a></li>
+              <li>
+                <form action="/api/logout" method="post">
+                  <button type="submit" class="dropdown-item" id="logoutBtn">Log Out</button>
+                </form>
+              </li>
             </ul>
           </li>
         </ul>
       </div>
     </div>
   </nav>
+
+  <!--Logout container -->
+  <h2 id="msgContainer" class="p-5 d-flex justify-content-center align-items-center"></h2>
 
   <!--Center trivia game container -->
 <div class="trivia-container card p-5 container-md d-flex flex-column justify-content-center align-items-center">
@@ -71,10 +78,11 @@
 </div>
 
 
-  <!--Link main js file & Bootstrap-->
+  <!--Link main js file & Bootstrap & Axios-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
     crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="main.js"></script>
 </body>
 

@@ -3,18 +3,20 @@ const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-const passport = require('passport');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
+const passport = require('./userController.js');
 const sequelize = require('./db');
-const User = require('./userModel');
-const strategy = require('./userController');
 
 const app = express();
 const { SERVER_PORT } = process.env;
 const {
   getQuestions,
+  logout,
+  saveGameResults,
+  registerUser,
+  loginUser,
+  checkAuthentication,
 } = require('./controller.js');
 
 require('dotenv').config();
@@ -33,72 +35,38 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
+// Serve static files from public folder.
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Route to fetch trivia questions from the API using the controller
 app.get('/api/questions', getQuestions);
 
-// Serve static files from public folder.
-app.use(express.static(path.join(__dirname, '../public')));
-
 // User Registration Route
-app.post('/api/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    // Check if the username already exists in the database
-    const existingUser = await User.findOne({ where: { username } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists' });
-    }
-
-    // Hash the password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create the user in the database
-    const newUser = await User.create({ username, password: hashedPassword });
-
-    // Registration successful
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+app.post('/api/register', registerUser);
 
 // User Login Route
-app.post('/api/login', passport.authenticate('local'), (req, res) => {
-  res.redirect('/index.html');
-});
+app.post(
+  '/api/login/',
+  passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
+  (req, res) => {
+    res.redirect('/index.html?login=true');
+  },
+);
 
 // Logout Route
-app.get('/logout', (req, res) => {
-  // Passport provides the `logout` function to terminate a login session.
-  // It will clear the login session and remove the `req.user` property.
+app.post('/api/logout', (req, res, next) => {
   req.logout((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-      res.status(500).json({ message: 'Logout failed' });
-    } else {
-      // Redirect the user to the desired page after successful logout
-      console.log('Logout success');
-      res.redirect('/index.html'); // Replace '/index' with the URL you want to redirect to
-    }
+    if (err) { return next(err); }
+    res.redirect('/index.html?logout=true');
   });
 });
 
-// Protected Route
-app.get('/api/stats', (req, res) => {
-  // This route is protected and requires the user to be authenticated.
-  // Passport's session handling will ensure that only authenticated users can access this route.
-  if (req.isAuthenticated()) {
-    res.json({ message: 'Welcome to the Stats page!' });
-  } else {
-    res.status(401).json({ message: 'Unauthorized' });
-  }
-});
+// Save user stats to database
+app.post('/api/saveResults', saveGameResults);
 
-// Start the app on the default port
+app.get('/api/checkAuthentication', checkAuthentication);
+
+// Start the app on the default port and test database connection
 app.listen(SERVER_PORT, async () => {
   console.log(`app listening at http://localhost:${SERVER_PORT}`);
   try {

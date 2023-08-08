@@ -61,51 +61,56 @@
 
   <!--Center trivia game container -->
   <section class="vh-100">
-  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
-    <div class="container h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
-          <div class="card" style="border-radius: 15px;">
-            <div class="card-body p-5">
-              <h2 class="text-uppercase text-center mb-5">Create an account</h2>
-
-              <form>
-
-                <div class="form-outline mb-3">
-                  <input type="text" id="loginUserName" class="form-control form-control-lg" />
-                  <label class="form-label">User-Name</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input type="password" id="loginUserPassword" class="form-control form-control-lg" />
-                  <label class="form-label">Password</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input type="password" id="loginUserPassword2" class="form-control form-control-lg" />
-                  <label class="form-label">Repeat your password</label>
-                </div>
-
-                <div class="d-flex justify-content-center">
-                  <button type="button" id="registerBtn"
-                    class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
-                </div>
-
-                <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="login.html"
-                    class="fw-bold text-body"><u>Login here</u></a></p>
-
-              </form>
-
+    <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+      <div class="container h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+            <div class="card" style="border-radius: 15px;">
+              <div class="card-body p-5">
+                <h2 class="text-uppercase text-center mb-5">Create an account</h2>
+  
+                <form method="post" action="/api/register">
+  
+                  <div class="form-outline mb-3">
+                    <input type="text" id="loginUserName" name="username" class="form-control form-control-lg" />
+                    <label class="form-label">User-Name</label>
+                  </div>
+  
+                  <div class="form-outline mb-3">
+                    <input type="password" id="loginUserPassword" name="password" class="form-control form-control-lg" />
+                    <label class="form-label">Password</label>
+                  </div>
+  
+                  <div class="form-outline mb-3">
+                    <input type="password" id="loginUserPassword2" name="password2" class="form-control form-control-lg" />
+                    <label class="form-label">Repeat your password</label>
+                  </div>
+  
+                  <div class="d-flex justify-content-center">
+                    <!-- Change the button type to "submit" -->
+                    <button type="submit" id="registerBtn"
+                      class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+                  </div>
+  
+                  <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="login.html"
+                      class="fw-bold text-body"><u>Login here</u></a></p>
+  
+                </form>
+  
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+  
   <!--Link main js file & Bootstrap-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-  <script src="signup.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="main.js"></script>
 </body>
 
 </html>

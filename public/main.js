@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 let questionIndex = 0;
 let score = 0;
 let questions = [];
@@ -20,6 +21,7 @@ async function fetchQuestions() {
     const data = await response.json();
     questions = data;
     displayQuestion();
+    // console.log(questions);
   } catch (error) {
     console.error('Failed to fetch questions:', error);
   }
@@ -28,8 +30,9 @@ async function fetchQuestions() {
 // Function to display the question by index. Randomly sort questions and display them accordingly.
 function displayQuestion() {
   const question = questions[questionIndex];
+  console.log(questions);
   if (!question) {
-    showEndMessage();
+    endGameLogic();
     return;
   }
 
@@ -41,7 +44,7 @@ function displayQuestion() {
     .join('');
 
   questionContainer.innerHTML = `
-    <h2>${question.question}</h2>
+    <h3>${question.question}</h3>
     ${optionsHtml}
   `;
 
@@ -86,17 +89,42 @@ function handleOptionClick(event) {
 
 // Function to display the next question in the questions array by increasing the index by one.
 function showNextQuestion() {
+  const currentQuestion = questions[questionIndex];
+  const { category } = currentQuestion;
+
   questionIndex++;
+  answerQuestion(category);
   displayQuestion();
   scoreElement.textContent = score;
   nextButton.style.display = 'none';
 }
 
-// Function to display the end game screen.
-function showEndMessage() {
+async function endGameLogic(categoryCounters) {
+  console.log(categoryCounters);
+  displayGameOver();
+  try {
+    const response = await axios.get('/api/checkAuthentication');
+    const { isAuthenticated } = response.data;
+
+    if (isAuthenticated) {
+      await axios.post('/api/saveResults', {
+        totalQuestionsAnswered: categoryCounters.totalQuestionsAnswered,
+        categoryCounters,
+      });
+      displayGameOver();
+    } else {
+      displayGameOver();
+    }
+  } catch (error) {
+    console.error('Error saving game results:', error);
+  }
+}
+
+function displayGameOver() {
   questionContainer.innerHTML = '<h2>Trivia game is over!</h2>';
   nextButton.style.display = 'none';
   restartButton.style.display = 'block';
+  console.log(categoryCounters);
 }
 
 function restartGame() {
@@ -108,38 +136,74 @@ function restartGame() {
   fetchQuestions();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  // Add an event listener to the "Log Out" link
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      // Send a GET request to the logout route
-      const response = await fetch('/api/logout', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        // Handle logout error, if needed
-        console.error('Logout failed:', response.statusText);
-        return;
-      }
-
-      // Logout successful, redirect to the desired page (e.g., /index.html)
-      window.location.href = '/index.html'; // Replace '/index.html' with the desired URL
-    } catch (error) {
-      // Handle any network errors or other exceptions
-      console.error('Logout error:', error.message);
-    }
-  });
-});
-
 // Add event handlers to the next/restart button to call a function when the button is clicked.
 nextButton.addEventListener('click', showNextQuestion);
 restartButton.addEventListener('click', restartGame);
 
 // Call fetchQuestions() to start the game loop.
 fetchQuestions();
+
+// Define the categoryCounters object
+const categoryCounters = {
+  totalQuestionsAnswered: 0,
+  'General Knowledge': 0,
+  'Entertainment: Books': 0,
+  'Entertainment: Film': 0,
+  'Entertainment: Music': 0,
+  'Entertainment: Musicals & Theatres': 0,
+  'Entertainment: Television': 0,
+  'Entertainment: Video Games': 0,
+  'Entertainment: Board Games': 0,
+  'Science & Nature': 0,
+  'Science: Computers': 0,
+  'Science: Mathematics': 0,
+  Mythology: 0,
+  Sports: 0,
+  Geography: 0,
+  History: 0,
+  Politics: 0,
+  Art: 0,
+  Celebrities: 0,
+  Animals: 0,
+  Vehicles: 0,
+  'Entertainment: Comics': 0,
+  'Science: Gadgets': 0,
+  'Entertainment: Japanese Anime & Manga': 0,
+  'Entertainment: Cartoon & Animations': 0,
+};
+
+// Function to increment counters when a question is answered
+function answerQuestion(category) {
+  console.log(`This is the ${category}`);
+  categoryCounters.totalQuestionsAnswered++;
+  categoryCounters[category]++;
+  console.log(categoryCounters);
+}
+
+function showMsgContainer(message) {
+  const popup = document.getElementById('msgContainer');
+  popup.innerText = message;
+  popup.style.display = 'block';
+
+  setTimeout(() => {
+    console.log('Message display for 3 seconds.');
+    popup.style.visibility = 'hidden';
+  }, 3000);
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+
+const logoutSuccess = urlParams.get('logout');
+if (logoutSuccess) {
+  showMsgContainer('You have been successfully logged out.');
+}
+
+const registered = urlParams.get('registered');
+if (registered) {
+  showMsgContainer('You have been successfully registered.');
+}
+
+const login = urlParams.get('login');
+if (login) {
+  showMsgContainer('You have been successfully login.');
+}
