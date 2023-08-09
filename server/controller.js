@@ -21,10 +21,9 @@ async function saveGameResults(req, categoryCounter) {
     const userId = req.user.user_id;
     console.log(categoryCounter);
     const [userStats] = await UserStats.findOrCreate({ where: { user_id: userId } });
-    // Iterate through the categories and update them accordingly
+
     Object.entries(categoryCounter).forEach(([category, value]) => {
-      if (category !== 'totalquestionsanswered') { // Camel case here
-        // Convert category to the format used in the database
+      if (category !== 'totalquestionsanswered') {
         const formattedCategory = category.replace(/:\s+/g, ': ').replace(/ & /g, ' &');
         userStats[formattedCategory] += value;
         console.log(`Updating ${formattedCategory} with value ${value}`);
@@ -74,6 +73,7 @@ const getUserStats = async (req, res) => {
     const userId = req.user.user_id;
     const stats = await UserStats.findOne({ where: { user_id: userId } });
     res.json(stats);
+    console.log(stats, 'Get user stats route hit OMGGGGGGGGGGGGGGGGG');
   } catch (error) {
     console.error('Error fetching user stats:', error);
     res.status(500).json({ error });

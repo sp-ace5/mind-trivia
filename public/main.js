@@ -11,8 +11,6 @@ const restartButton = document.getElementById('restart-btn');
 restartButton.style.display = 'none';
 nextButton.addEventListener('click', showNextQuestion);
 restartButton.addEventListener('click', restartGame);
-fetchQuestions();
-drawChart();
 
 // Async function to fetch our questions from the server.
 async function fetchQuestions() {
@@ -184,32 +182,43 @@ if (login) {
 }
 
 function drawChart() {
+  google.charts.load('current', { packages: ['corechart'] });
+  google.charts.setOnLoadCallback(fetchDataAndDraw);
+}
+
+function fetchDataAndDraw() {
   axios.get('/api/user_stats')
     .then((response) => {
       const userStatsData = response.data;
-
-      google.charts.load('current', { packages: ['corechart'] });
-      google.charts.setOnLoadCallback(() => {
-        // Convert userStatsData to Google Charts format
-        const data = new google.visualization.DataTable();
-        data.addColumn('string', 'Category');
-        data.addColumn('number', 'Value');
-
-        // Assuming userStatsData is an object with category names and values
-        Object.entries(userStatsData).forEach(([category, value]) => {
-          data.addRow([category, value]);
-        });
-
-        // Define chart options
-        const options = {
-          title: 'User Stats',
-          // Additional options here...
-        };
-
-        // Draw the chart
-        const chart = new google.visualization.PieChart(document.getElementById('userStatsChart'));
-        chart.draw(data, options);
-      });
+      drawActualChart(userStatsData);
     })
     .catch((error) => console.error(error));
 }
+
+function drawActualChart(userStatsData) {
+  const data = new google.visualization.DataTable();
+  data.addColumn('string', 'Category');
+  data.addColumn('number', 'Value');
+
+  Object.entries(userStatsData).forEach(([category, value]) => {
+    if (category !== 'user_id') {
+      data.addRow([category, value]);
+    }
+  });
+
+  const options = {
+    title: 'Number of questions answered by category',
+    width: 400, // Set the desired width
+    height: 400, // Set the desired height
+  };
+
+  // Draw the pie chart
+  const chart = new google.visualization.PieChart(document.getElementById('userStatsPieChart'));
+  chart.draw(data, options);
+
+  // Draw the bar chart with the same options
+  const barChart = new google.visualization.BarChart(document.getElementById('userStatsBarChart'));
+  barChart.draw(data, options);
+}
+
+fetchQuestions();
