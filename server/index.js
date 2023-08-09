@@ -26,7 +26,7 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false },
+  cookie: { secure: true },
 }));
 app.use(express.urlencoded({
   extended: true,
