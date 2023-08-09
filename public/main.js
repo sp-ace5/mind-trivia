@@ -8,8 +8,11 @@ const nextButton = document.getElementById('next-btn');
 const scoreElement = document.getElementById('score');
 const restartButton = document.getElementById('restart-btn');
 
-// Hide restart button on start
 restartButton.style.display = 'none';
+nextButton.addEventListener('click', showNextQuestion);
+restartButton.addEventListener('click', restartGame);
+fetchQuestions();
+drawChart();
 
 // Async function to fetch our questions from the server.
 async function fetchQuestions() {
@@ -21,7 +24,6 @@ async function fetchQuestions() {
     const data = await response.json();
     questions = data;
     displayQuestion();
-    // console.log(questions);
   } catch (error) {
     console.error('Failed to fetch questions:', error);
   }
@@ -30,7 +32,6 @@ async function fetchQuestions() {
 // Function to display the question by index. Randomly sort questions and display them accordingly.
 function displayQuestion() {
   const question = questions[questionIndex];
-  console.log(questions);
   if (!question) {
     endGameLogic();
     return;
@@ -56,7 +57,6 @@ function displayQuestion() {
 
 // Function to handle the user clicking on an option button and if it's the correct guess; increment score by one.
 function handleOptionClick(event) {
-  // Disable option buttons after clicking
   const optionButtons = document.querySelectorAll('.option-btn');
   optionButtons.forEach((button) => {
     button.removeEventListener('click', handleOptionClick);
@@ -66,24 +66,17 @@ function handleOptionClick(event) {
   const currentQuestion = questions[questionIndex];
   const correctOption = currentQuestion.correct_answer;
 
-  // Check if the selected option is correct or not
   if (selectedOption === correctOption) {
-    // Change the button color to green for the correct guess
     event.target.classList.add('btn-success');
     score++;
   } else {
-    // Change the button color to red for the wrong guess
     event.target.classList.add('btn-danger');
-
-    // Find the correct option button and change its color to green
     optionButtons.forEach((button) => {
       if (button.textContent === correctOption) {
         button.classList.add('btn-success');
       }
     });
   }
-
-  // Show the next button
   nextButton.style.display = 'block';
 }
 
@@ -97,27 +90,6 @@ function showNextQuestion() {
   displayQuestion();
   scoreElement.textContent = score;
   nextButton.style.display = 'none';
-}
-
-async function endGameLogic(categoryCounters) {
-  console.log(categoryCounters);
-  displayGameOver();
-  try {
-    const response = await axios.get('/api/checkAuthentication');
-    const { isAuthenticated } = response.data;
-
-    if (isAuthenticated) {
-      await axios.post('/api/saveResults', {
-        totalQuestionsAnswered: categoryCounters.totalQuestionsAnswered,
-        categoryCounters,
-      });
-      displayGameOver();
-    } else {
-      displayGameOver();
-    }
-  } catch (error) {
-    console.error('Error saving game results:', error);
-  }
 }
 
 function displayGameOver() {
@@ -136,16 +108,8 @@ function restartGame() {
   fetchQuestions();
 }
 
-// Add event handlers to the next/restart button to call a function when the button is clicked.
-nextButton.addEventListener('click', showNextQuestion);
-restartButton.addEventListener('click', restartGame);
-
-// Call fetchQuestions() to start the game loop.
-fetchQuestions();
-
 // Define the categoryCounters object
 const categoryCounters = {
-  totalQuestionsAnswered: 0,
   'General Knowledge': 0,
   'Entertainment: Books': 0,
   'Entertainment: Film': 0,
@@ -172,10 +136,22 @@ const categoryCounters = {
   'Entertainment: Cartoon & Animations': 0,
 };
 
+// Async function to send the end game results to the server
+async function endGameLogic() {
+  try {
+    console.log('Before sending results:', categoryCounters);
+    await axios.post('/api/saveResults', {
+      categoryCounters,
+    });
+    console.log('Game results saved.');
+    displayGameOver();
+  } catch (error) {
+    console.error('Error saving game results:', error);
+  }
+}
+
 // Function to increment counters when a question is answered
 function answerQuestion(category) {
-  console.log(`This is the ${category}`);
-  categoryCounters.totalQuestionsAnswered++;
   categoryCounters[category]++;
   console.log(categoryCounters);
 }
@@ -186,7 +162,6 @@ function showMsgContainer(message) {
   popup.style.display = 'block';
 
   setTimeout(() => {
-    console.log('Message display for 3 seconds.');
     popup.style.visibility = 'hidden';
   }, 3000);
 }
@@ -206,4 +181,35 @@ if (registered) {
 const login = urlParams.get('login');
 if (login) {
   showMsgContainer('You have been successfully login.');
+}
+
+function drawChart() {
+  axios.get('/api/user_stats')
+    .then((response) => {
+      const userStatsData = response.data;
+
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(() => {
+        // Convert userStatsData to Google Charts format
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Category');
+        data.addColumn('number', 'Value');
+
+        // Assuming userStatsData is an object with category names and values
+        Object.entries(userStatsData).forEach(([category, value]) => {
+          data.addRow([category, value]);
+        });
+
+        // Define chart options
+        const options = {
+          title: 'User Stats',
+          // Additional options here...
+        };
+
+        // Draw the chart
+        const chart = new google.visualization.PieChart(document.getElementById('userStatsChart'));
+        chart.draw(data, options);
+      });
+    })
+    .catch((error) => console.error(error));
 }

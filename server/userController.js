@@ -16,17 +16,31 @@ const strategy = new LocalStrategy(async (username, password, done) => {
   }
 });
 
-passport.serializeUser((user, cb) => {
-  cb(null, {
-    id: user.user_id,
-    username: user.username,
-  });
+passport.serializeUser((user, done) => {
+  done(null, user.user_id);
 });
 
-passport.deserializeUser((user, cb) => {
-  process.nextTick(() => cb(null, user));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return done(null, false);
+    }
+    return done(null, user);
+  } catch (error) {
+    return done(error);
+  }
 });
-
+// Register the strategy with passport
 passport.use('local', strategy);
 
-module.exports = passport;
+// Authentication middleware
+const checkAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    console.log('User is authenticated');
+    return next();
+  }
+  console.log('User is NOT authenticated ');
+};
+
+module.exports = { passport, checkAuthenticated };

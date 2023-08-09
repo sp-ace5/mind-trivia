@@ -24,132 +24,127 @@ const UserStats = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: false,
       allowNull: false,
     },
-    general_knowledge: {
+    'General Knowledge': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_books: {
+    'Entertainment: Books': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_film: {
+    'Entertainment: Film': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_music: {
+    'Entertainment: Music': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_musicals_theatres: {
+    'Entertainment: Musicals & Theatres': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_television: {
+    'Entertainment: Television': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_video_games: {
+    'Entertainment: Video Games': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_board_games: {
+    'Entertainment: Board Games': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    science_nature: {
+    'Science & Nature': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    science_computers: {
+    'Science: Computers': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    science_mathematics: {
+    'Science: Mathematics': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    mythology: {
+    Mythology: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    sports: {
+    Sports: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    geography: {
+    Geography: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    history: {
+    History: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    politics: {
+    Politics: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    art: {
+    Art: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    celebrities: {
+    Celebrities: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    animals: {
+    Animals: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    vehicles: {
+    Vehicles: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_comics: {
+    'Entertainment: Comics': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    science_gadgets: {
+    'Science: Gadgets': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_japanese_anime_manga: {
+    'Entertainment: Japanese Anime & Manga': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    entertainment_cartoon_animations: {
+    'Entertainment: Cartoon & Animations': {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
-    },
-    total_questions_answered: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
     },
   },
   {

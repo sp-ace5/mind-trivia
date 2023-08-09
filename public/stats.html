@@ -79,21 +79,25 @@
     </div>
   
     <!-- Placeholder for other statistical information -->
-    <div class="row mt-5">
-      <div class="col-md-6">
-        <h3 class="mb-3">Total Users: <span id="totalUsers">0</span></h3>
-        <h3 class="mb-3">Total Revenue: <span id="totalRevenue">$0</span></h3>
-        <!-- Add more statistical information here -->
+    <section>
+      <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+        <div class="container h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+              <div class="card" style="border-radius: 15px;">
+                <div class="card-body p-5">
+                  <div id="userStatsChart" style="width: 100%; height: 400px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="col-md-6">
-        <!-- Placeholder for other statistical information -->
-      </div>
-    </div>
-  </div>
-  
+    </section>
         
   <!--Link main js file & Bootstrap-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script src="main.js"></script>
 </body>
 

@@ -18,62 +18,49 @@ async function getQuestions(req, res) {
 // Save the user stats
 async function saveGameResults(req, categoryCounter) {
   try {
-    if (req.isAuthenticated()) {
-      const userId = req.user.user_id;
-      const userStats = await UserStats.findOne({ where: { user_id: userId } });
-      console.log('User Stats:', userStats);
-      if (userStats) {
-        console.log('User statistics found for user_id:', userId);
-        userStats.total_questions_answered += categoryCounter.totalQuestionsAnswered;
-
-        Object.entries(categoryCounter).forEach(([category, value]) => {
-          if (category !== 'totalQuestionsAnswered') {
-            userStats[category] += value;
-            console.log(`Updating ${category} with value ${value}`);
-          }
-        });
-
-        // Save the updated userStats object
-        console.log(userStats);
-        await userStats.save();
-      } else {
-        console.error('User statistics not found for user_id:', userId);
+    const userId = req.user.user_id;
+    console.log(categoryCounter);
+    const [userStats] = await UserStats.findOrCreate({ where: { user_id: userId } });
+    // Iterate through the categories and update them accordingly
+    Object.entries(categoryCounter).forEach(([category, value]) => {
+      if (category !== 'totalquestionsanswered') { // Camel case here
+        // Convert category to the format used in the database
+        const formattedCategory = category.replace(/:\s+/g, ': ').replace(/ & /g, ' &');
+        userStats[formattedCategory] += value;
+        console.log(`Updating ${formattedCategory} with value ${value}`);
       }
-    } else {
-      console.error('User not authenticated.');
-    }
+    });
+
+    await userStats.save();
+    return { success: true, message: 'Game results saved.' };
   } catch (error) {
     console.error('Error saving game results:', error);
     throw error;
   }
 }
+module.exports = saveGameResults;
 
 // Register new user to the database and login user in.
 // eslint-disable-next-line consistent-return
-async function registerUser(req, res, next) {
+async function registerUser(req, res) {
   const { username, password } = req.body;
 
   try {
-    // Check if the username already exists in the database
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
       return res.status(400).json({ message: 'Username already exists' });
     }
 
-    // Hash the password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create the user in the database
     const newUser = await User.create({ username, password: hashedPassword });
 
-    // Authenticate the user after creating the account
     req.login(newUser, (err) => {
       if (err) {
         console.error('Error logging in user after registration:', err);
         return res.status(500).json({ message: 'Server error' });
       }
-      // Registration and login successful
       console.log('Registration and login successful');
       res.redirect('/index.html?registered=true');
     });
@@ -82,14 +69,20 @@ async function registerUser(req, res, next) {
     res.status(500).json({ message: 'Server error' });
   }
 }
-
-function checkAuthentication(req, res) {
-  res.json({ isAuthenticated: req.isAuthenticated() });
-}
+const getUserStats = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const stats = await UserStats.findOne({ where: { user_id: userId } });
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({ error });
+  }
+};
 
 module.exports = {
   getQuestions,
   saveGameResults,
   registerUser,
-  checkAuthentication,
+  getUserStats,
 };

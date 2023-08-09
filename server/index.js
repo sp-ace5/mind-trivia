@@ -4,19 +4,16 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const passport = require('./userController.js');
+const { passport, checkAuthenticated } = require('./userController.js');
 const sequelize = require('./db');
 
 const app = express();
 const { SERVER_PORT } = process.env;
 const {
   getQuestions,
-  logout,
   saveGameResults,
   registerUser,
-  loginUser,
-  checkAuthentication,
+  getUserStats,
 } = require('./controller.js');
 
 require('dotenv').config();
@@ -29,14 +26,31 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true },
+  cookie: { secure: false },
 }));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({
+  extended: true,
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 // Serve static files from public folder.
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Save user stats to database if user is authenticated
+app.post('/api/saveResults', checkAuthenticated, async (req, res) => {
+  console.log('Save results route hit');
+  try {
+    const result = await saveGameResults(req, req.body.categoryCounters);
+    if (result.success) {
+      res.status(200).json({ message: result.message });
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (error) {
+    console.error('Error saving game results:', error);
+    res.status(500).json({ message: 'Error saving game results' });
+  }
+});
 
 // Route to fetch trivia questions from the API using the controller
 app.get('/api/questions', getQuestions);
@@ -44,12 +58,18 @@ app.get('/api/questions', getQuestions);
 // User Registration Route
 app.post('/api/register', registerUser);
 
+// Route to fetch user stats from the database
+app.get('/api/user_stats', getUserStats);
+
 // User Login Route
 app.post(
   '/api/login/',
-  passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
-  (req, res) => {
-    res.redirect('/index.html?login=true');
+  passport.authenticate('local', {
+    successRedirect: '/index.html?login=true',
+    failureRedirect: '/login.html?login=false',
+  }),
+  (err, req, res, next) => {
+    if (err) next(err);
   },
 );
 
@@ -60,11 +80,6 @@ app.post('/api/logout', (req, res, next) => {
     res.redirect('/index.html?logout=true');
   });
 });
-
-// Save user stats to database
-app.post('/api/saveResults', saveGameResults);
-
-app.get('/api/checkAuthentication', checkAuthentication);
 
 // Start the app on the default port and test database connection
 app.listen(SERVER_PORT, async () => {
