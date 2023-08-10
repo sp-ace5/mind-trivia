@@ -5,7 +5,7 @@ const { UserStats, User } = require('./userModel');
 // Function to fetch questions from the API using axios
 async function getQuestions(req, res) {
   try {
-    const amount = 2;
+    const amount = 5;
     const response = await axios.get(`https://opentdb.com/api.php?amount=${amount}`);
     const questions = response.data.results;
     res.json(questions);

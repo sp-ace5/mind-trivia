@@ -208,8 +208,8 @@ function drawActualChart(userStatsData) {
 
   const options = {
     title: 'Number of questions answered by category',
-    width: 400, // Set the desired width
-    height: 400, // Set the desired height
+    width: 400,
+    height: 400,
   };
 
   // Draw the pie chart
